@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <title>Covid 19 Rates 2020</title>
+    <meta name="viewport" content="initial-scale=1,maximum-scale=1,user-scalable=no">
+    <link href="https://fonts.googleapis.com/css2?family=Open+Sans&display=swap" rel="stylesheet">
+    <link href="https://api.mapbox.com/mapbox-gl-js/v2.8.1/mapbox-gl.css" rel="stylesheet">
+    <script src="https://api.mapbox.com/mapbox-gl-js/v2.8.1/mapbox-gl.js"></script>
+    <link rel="stylesheet" href="css/style.css"/>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+        }
+
+        #map {
+            position: absolute;
+            top: 0;
+            bottom: 0;
+            width: 100%;
+        }
+
+        /* the layout of the legend panel */
+        #legend {
+            position: absolute;
+            bottom: 0;
+            right: 0;
+            width: 150px;
+            background: #fff;
+            margin-right: 20px;
+            margin-bottom: 40px;
+            padding: 10px 20px 10px 10px;
+            border-radius: 3px;
+            text-align: center;
+            font-family: 'Open Sans', sans-serif;
+        }
+
+        .legend-key {
+            display: inline-block;
+            border-radius: 20%;
+            width: 10px;
+            height: 10px;
+            margin-right: 5px;
+        }
+
+        /* each line for a break */
+        .break {
+            position: relative;
+            margin: 0px;
+            padding: 0px;
+        }
+
+        /* basic style for a dot/circle */
+        .dot {
+            display: inline-block;
+            margin-top: 5px;
+            border-radius: 50%;
+            opacity: 0.6;
+        }
+
+        /* the label for the dot */
+        .dot-label {
+            position: absolute;
+            top: 0;
+            right: 0;
+            font-style: italic;
+        }
+
+        /* the text color of a hyper link */
+        a {
+            color: black
+        }
+    </style>
+</head>
+
+<body>
+    <div id="map"></div>
+    <div id="legend"></div>
+    <div id="title">
+        U.S. Census Tract Covid-19 Rates
+    </div>
+    <div id="subtitle">
+        2020
+    </div>
+
+    <script>
+
+        mapboxgl.accessToken =
+            'pk.eyJ1IjoibWpvdSIsImEiOiJjbWh5ZWZ6N2gwYWluMmptdTVlczZ5NXEzIn0.Ha9WIGJy4xJyUiZSR5xbNg';
+
+        let map = new mapboxgl.Map({
+            container: 'map', // container ID
+            style: 'mapbox://styles/mapbox/dark-v10',
+            zoom: 3.5, // starting zoom
+            minZoom: 1, // minimum zoom level of the map
+            center: [-100, 40], // starting center
+            projection: 'albers'
+        });
+
+
+        async function geojsonFetch() { 
+            let response = await fetch('assets/us-covid-2020-rates.json');
+            let covidData = await response.json();  
+
+            map.on('load', function loadingData() {
+                map.addSource('covidData', {
+                    type: 'geojson',
+                    data: covidData
+                });
+
+                map.addLayer({
+                    'id': 'covidData-rates',
+                    'type': 'fill',
+                    'source': 'covidData',
+                    'paint': {
+                        'fill-color': [
+                            'step',
+                            ['get', 'rates'],
+                            '#F1EEF6',   // stop_output_0
+                            20,          // stop_input_0
+                            '#D7B5D8',   // stop_output_1
+                            40,          // stop_input_1
+                            '#DF65B0',   // stop_output_2
+                            60,          // stop_input_2
+                            '#DD1C77',   // stop_output_3
+                            80,         // stop_input_3
+                            '#980043',   // stop_output_4
+                        ],
+                        'fill-outline-color': '#BBBBBB',
+                        'fill-opacity': 0.7,
+                    }
+                });
+
+                const layers = [
+                    '0-19%',
+                    '20-39',
+                    '40-59',
+                    '60-79%',
+                    '80-100%'
+                ];
+                const colors = [
+                    '#F1EEF6',   
+                    '#D7B5D8',   
+                    '#DF65B0', 
+                    '#DD1C77',  
+                    '#980043'
+                ];
+
+                const legend = document.getElementById('legend');
+                legend.innerHTML = "<b>COVID-19 Rates<br>(cases/1k residents)</b><br><br>";
+
+                layers.forEach((layer, i) => {
+                    const color = colors[i];
+                    const item = document.createElement('div');
+                    const key = document.createElement('span');
+                    key.className = 'legend-key';
+                    key.style.backgroundColor = color;
+
+                    const value = document.createElement('span');
+                    value.innerHTML = `${layer}`;
+                    item.appendChild(key);
+                    item.appendChild(value);
+                    legend.appendChild(item);
+                });
+
+                map.on('mousemove', ({point}) => {
+                        const state = map.queryRenderedFeatures(point, {
+                            layers: ['covidData-rates']
+                        });
+                        document.getElementById('text-description').innerHTML = state.length ?
+                            `<h3>${state[0].properties.name}</h3><p><strong><em>${state[0].properties.density}</strong> people per square mile</em></p>` :
+                            `<p>Hover over a state!</p>`;
+                });
+            });
+
+        }
+
+        geojsonFetch();
+
+    </script>
+
+</body>
+
+</html>

@@ -8,9 +8,9 @@ let map = new mapboxgl.Map({
     center: [-100, 40], // starting center
     projection: 'albers'
 });
-const grades = [50, 250, 1000, 5000, 10000],
-            colors = ['rgb(208,209,230)', 'rgb(103,169,207)', 'rgb(1,108,89)', 'rgb(1,70,54)', 'rgb(0,34,19)'],
-            radii = [2, 5, 10, 20, 30];
+const grades = [0, 1000, 5000, 10000, 50000, 100000],
+            colors = ['#fef0d9','#fdd49e','#fdbb84','#fc8d59','#e34a33','#b30000'],
+            radii = [3, 5, 10, 15, 20, 25];
         //load data to the map as new layers.
         //map.on('load', function loadingData() {
         map.on('load', () => { //simplifying the function statement: arrow with brackets to define a function
@@ -34,7 +34,8 @@ const grades = [50, 250, 1000, 5000, 10000],
                             [grades[1], radii[1]],
                             [grades[2], radii[2]],
                             [grades[3], radii[3]],
-                            [grades[4], radii[4]]
+                            [grades[4], radii[4]],
+                            [grades[5], radii[5]]
                         ]
                     },
                     // change the color of the circle as cases value increases
@@ -45,12 +46,13 @@ const grades = [50, 250, 1000, 5000, 10000],
                             [grades[1], colors[1]],
                             [grades[2], colors[2]],
                             [grades[3], colors[3]],
-                            [grades[4], colors[4]]
+                            [grades[4], colors[4]],
+                            [grades[5], colors[5]]
                         ]
                     },
                     'circle-stroke-color': 'white',
                     'circle-stroke-width': 1,
-                    'circle-opacity': 0.6
+                    'circle-opacity': 0.9
                 }
             });
             // click on tree to view magnitude in a popup
@@ -63,23 +65,37 @@ const grades = [50, 250, 1000, 5000, 10000],
         });
         // create legend
         const legend = document.getElementById('legend');
-        //set up legend grades and labels
-        var labels = ['<strong>Magnitude</strong>'],
+        // set up legend grades and labels (show ranges covered by each circle)
+        var labels = ['<strong>COVID-19 Case Counts</strong>'],
             vbreak;
-        //iterate through grades and create a scaled circle and label for each
+        // iterate through grades and create a scaled circle and a range label for each
         for (var i = 0; i < grades.length; i++) {
             vbreak = grades[i];
-            // you need to manually adjust the radius of each dot on the legend 
-            // in order to make sure the legend can be properly referred to the dot on the map.
-            dot_radii = 2 * radii[i];
-            labels.push(
-                '<p class="break"><i class="dot" style="background:' + colors[i] + '; width: ' + dot_radii +
-                'px; height: ' +
-                dot_radii + 'px; "></i> <span class="dot-label" style="top: ' + dot_radii / 2 + 'px;">' + vbreak +
-                '</span></p>');
+            // build a human-friendly range label
+            var rangeLabel;
+            if (i === 0) {
+                rangeLabel = '< ' + grades[0].toLocaleString();
+            } else if (i < grades.length - 1) {
+                rangeLabel = grades[i].toLocaleString() + ' - ' + grades[i + 1].toLocaleString();
+            } else {
+                rangeLabel = '≥ ' + grades[i].toLocaleString();
+            }
+
+            // Creates a dot and label for each circle size
+            for (var i = 0; i < grades.length; i++) {
+                let lower = grades[i];
+                let upper = grades[i + 1] ? grades[i + 1] - 1 : null; // next grade minus 1
+                let rangeLabel = upper ? `${lower.toLocaleString()} – ${upper.toLocaleString()}` : `≥ ${lower.toLocaleString()}`;
+                
+                let dot_radii = 13 + radii[i];
+                labels.push(
+                    '<p class="break" style="display: flex; align-items: center; margin-bottom: 4px;">' +
+                        '<i class="dot" style="background:' + colors[i] + 
+                        '; width: ' + dot_radii + 'px; height: ' + dot_radii + 'px; border-radius: 50%; margin-right: 8px;"></i>' +
+                        '<span class="dot-label">' + rangeLabel + '</span>' +
+                    '</p>'
+                );
+            }
         }
-        // add the data source
-        const source =
-            '<p style="text-align: right; font-size:10pt">Source: <a href="https://earthquake.usgs.gov/earthquakes/">USGS</a></p>';
         // combine all the html codes.
-        legend.innerHTML = labels.join('') + source;
+        legend.innerHTML = labels.join('');

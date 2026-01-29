@@ -36,10 +36,13 @@
     <div id="map"></div>
     <div id="legend"></div>
     <div id="title">
-        U.S. Counties Covid-19 Rates
+        COVID-19 Case Rates (2020)
     </div>
     <div id="subtitle">
-        2020
+        This map shows COVID-19 case rates per 1,000 residents in U.S. counties in 2020.
+        Darker shades indicate higher case rates.<br>
+        This map is useful for those interested in comparing the relative impact of COVID-19 across different counties.<br>
+        Data source: <a href= "https://github.com/nytimes/covid-19-data/blob/43d32dde2f87bd4dafbb7d23f5d9e878124018b8/live/us-counties.csv" >New York Times</a>.
     </div>
     <div id='text-description'>
             <p>Hover over a county!</p>
@@ -79,14 +82,16 @@
                             'step',
                             ['get', 'rates'],
                             '#F1EEF6',   // stop_output_0
-                            20,          // stop_input_0
+                            26,          // stop_input_0
                             '#D7B5D8',   // stop_output_1
-                            40,          // stop_input_1
+                            51,          // stop_input_1
                             '#DF65B0',   // stop_output_2
-                            60,          // stop_input_2
+                            76,          // stop_input_2
                             '#DD1C77',   // stop_output_3
-                            80,         // stop_input_3
+                            101,         // stop_input_3
                             '#980043',   // stop_output_4
+                            126,         // stop_input_4
+                            '#67001F'    // stop_output_5
                         ],
                         'fill-outline-color': '#BBBBBB',
                         'fill-opacity': 0.7,
@@ -94,18 +99,20 @@
                 });
 
                 const rates = [
-                    '0-19%',
-                    '20-39',
-                    '40-59',
-                    '60-79%',
-                    '80-100%'
+                    '0-25',
+                    '26-50',
+                    '51-75',
+                    '76-100',
+                    '100-125',
+                    '126+'
                 ];
                 const colors = [
                     '#F1EEF6',   
                     '#D7B5D8',   
                     '#DF65B0', 
                     '#DD1C77',  
-                    '#980043'
+                    '#980043',   
+                    '#67001F'
                 ];
 
                 const legend = document.getElementById('legend');

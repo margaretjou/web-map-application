@@ -9,16 +9,35 @@
     <link href="https://api.mapbox.com/mapbox-gl-js/v2.8.1/mapbox-gl.css" rel="stylesheet">
     <script src="https://api.mapbox.com/mapbox-gl-js/v2.8.1/mapbox-gl.js"></script>
     <link rel="stylesheet" href="css/style.css"/>
+    <style> 
+        #legend {
+            position: absolute;
+            bottom: 0;
+            right: 0;
+            width: 200px;
+            background: #fff;
+            margin-right: 20px;
+            margin-bottom: 40px;
+            padding: 10px 20px 10px 10px;
+            border-radius: 3px;
+            text-align: center;
+            font-family: 'Open Sans', sans-serif;
+        }
+    </style>
 </head>
 
 <body>
     <div id="map"></div>
     <div id="legend"></div>
-        <div id="title">
-        U.S. Counties Covid-19 Cases
+    <div id="title">
+        COVID-19 Case Counts (2020)
     </div>
     <div id="subtitle">
-        2020
+        This map shows COVID-19 case counts in U.S. counties in 2020.
+        Larger circle sizes indicate higher case counts.<br>
+        This map is useful for those interested in understanding the geographic distribution of COVID-19 cases.<br>
+        Data source: <a href= "https://www.census.gov/geographies/mapping-files/time-series/geo/carto-boundary-file.html" >U.S. Census Bureau</a>.
+    </div>
     </div>
 
     <script src="js/main.js"></script>

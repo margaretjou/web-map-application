@@ -10,33 +10,6 @@
     <script src="https://api.mapbox.com/mapbox-gl-js/v2.8.1/mapbox-gl.js"></script>
     <link rel="stylesheet" href="css/style.css"/>
     <style>
-        body {
-            margin: 0;
-            padding: 0;
-        }
-
-        #map {
-            position: absolute;
-            top: 0;
-            bottom: 0;
-            width: 100%;
-        }
-
-        /* the layout of the legend panel */
-        #legend {
-            position: absolute;
-            bottom: 0;
-            right: 0;
-            width: 150px;
-            background: #fff;
-            margin-right: 20px;
-            margin-bottom: 40px;
-            padding: 10px 20px 10px 10px;
-            border-radius: 3px;
-            text-align: center;
-            font-family: 'Open Sans', sans-serif;
-        }
-
         .legend-key {
             display: inline-block;
             border-radius: 20%;
@@ -45,32 +18,16 @@
             margin-right: 5px;
         }
 
-        /* each line for a break */
-        .break {
-            position: relative;
-            margin: 0px;
-            padding: 0px;
-        }
-
-        /* basic style for a dot/circle */
-        .dot {
-            display: inline-block;
-            margin-top: 5px;
-            border-radius: 50%;
-            opacity: 0.6;
-        }
-
-        /* the label for the dot */
-        .dot-label {
-            position: absolute;
-            top: 0;
-            right: 0;
-            font-style: italic;
-        }
-
-        /* the text color of a hyper link */
-        a {
-            color: black
+        #text-description {
+            position: absolute;  
+            bottom: 35px;
+            left: 10px;
+            width: 150px;
+            background: #fff;
+            padding: 10px 20px 10px 10px;
+            border-radius: 3px;
+            font-family: 'Open Sans', sans-serif;
+            z-index: 10;              /* ensure it sits above the map */
         }
     </style>
 </head>
@@ -79,10 +36,13 @@
     <div id="map"></div>
     <div id="legend"></div>
     <div id="title">
-        U.S. Census Tract Covid-19 Rates
+        U.S. Counties Covid-19 Rates
     </div>
     <div id="subtitle">
         2020
+    </div>
+    <div id='text-description'>
+            <p>Hover over a county!</p>
     </div>
 
     <script>
@@ -133,7 +93,7 @@
                     }
                 });
 
-                const layers = [
+                const rates = [
                     '0-19%',
                     '20-39',
                     '40-59',
@@ -151,7 +111,7 @@
                 const legend = document.getElementById('legend');
                 legend.innerHTML = "<b>COVID-19 Rates<br>(cases/1k residents)</b><br><br>";
 
-                layers.forEach((layer, i) => {
+                rates.forEach((rates, i) => {
                     const color = colors[i];
                     const item = document.createElement('div');
                     const key = document.createElement('span');
@@ -159,19 +119,20 @@
                     key.style.backgroundColor = color;
 
                     const value = document.createElement('span');
-                    value.innerHTML = `${layer}`;
+                    value.innerHTML = `${rates}`;
                     item.appendChild(key);
                     item.appendChild(value);
                     legend.appendChild(item);
                 });
 
                 map.on('mousemove', ({point}) => {
-                        const state = map.queryRenderedFeatures(point, {
+                        const censusTract = map.queryRenderedFeatures(point, {
                             layers: ['covidData-rates']
                         });
-                        document.getElementById('text-description').innerHTML = state.length ?
-                            `<h3>${state[0].properties.name}</h3><p><strong><em>${state[0].properties.density}</strong> people per square mile</em></p>` :
-                            `<p>Hover over a state!</p>`;
+                        document.getElementById('text-description').innerHTML = censusTract.length ?
+                            `<h3>${censusTract[0].properties.county} County</h3>
+                            <p><strong><em>${censusTract[0].properties.rates}</strong> cases per 1k residents</em></p>` :
+                            `<p>Hover over a county!</p>`;
                 });
             });
 

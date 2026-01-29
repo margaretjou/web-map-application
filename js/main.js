@@ -67,14 +67,14 @@ const caseNum = [0, 1000, 5000, 10000, 50000, 100000],
         const legend = document.getElementById('legend');
         // set up legend (show ranges covered by each circle)
         var labels = ['<strong>COVID-19 Case Counts</strong>']
-        
+
         // iterate through caseNum and create a scaled circle and a range label for each
         for (var i = 0; i < caseNum.length; i++) {
 
             // creates labels for the case number ranges
             var rangeLabel;
             if (i < caseNum.length - 1) {
-                rangeLabel = caseNum[i] + ' - ' + caseNum[i + 1];
+                rangeLabel = caseNum[i] + ' - ' + (caseNum[i + 1] - 1);
             } else {
                 rangeLabel = '≥ ' + caseNum[i];    // last value
             }
